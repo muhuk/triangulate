@@ -1,6 +1,9 @@
 (ns triangulate.core)
 
 
+(defrecord Triangle [^long a ^long b ^long c A B C circumcenter ^double radius])
+
+
 (declare distance sides)
 (defn circumcircle [a b c]
   (let [[Ax Ay] a
@@ -22,13 +25,13 @@
                  (* dB (- Ax Cx))
                  (* dC (- Bx Ax)))
               (* -1 origin-denom))
-        center [Ox Oy]
+        circumcenter [Ox Oy]
         radius (/ (* AB BC AC)
                   (Math/sqrt (* (+ AB BC AC)
                                 (- (+ AB BC) AC)
                                 (- (+ BC AC) AB)
                                 (- (+ AB AC) BC))))]
-    [center radius]))
+    [circumcenter radius]))
 
 
 (defn distance
@@ -36,6 +39,16 @@
   [[x1 y1] [x2 y2]]
   (Math/sqrt (+ (Math/pow (- x2 x1) 2)
                 (Math/pow (- y2 y1) 2))))
+
+
+(defn make-triangle
+  ""
+  [points ^long a ^long b ^long c]
+  (let [A (nth points a)
+        B (nth points b)
+        C (nth points c)
+        [circumcenter radius] (circumcircle A B C)]
+    (Triangle. a b c A B C circumcenter radius)))
 
 
 (defn sides
