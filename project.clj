@@ -1,6 +1,6 @@
 (defproject triangulate "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :description "A Clojure implementation of \"Efficient Triangulation Algorithm Suitable for Terrain Modelling\" (Bourke, 1989)."
+  :url "https://github.com/muhuk/triangulate"
   :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+            :url "http://opensource.org/licenses/eclipse-1.0.php"}
   :dependencies [[org.clojure/clojure "1.5.1"]])
