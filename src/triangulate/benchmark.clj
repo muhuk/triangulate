@@ -1,5 +1,6 @@
 (ns triangulate.benchmark
-  (:require [triangulate.core :refer [triangulate]])
+  (:require [triangulate.core :refer [triangulate]]
+            [criterium.core :refer [bench]])
   (:gen-class))
 
 
@@ -1022,4 +1023,9 @@
   [& args]
   ;; work around dangerous default behaviour in Clojure
   (alter-var-root #'*read-eval* (constantly false))
-  (prn (triangulate points)))
+  (time (do (print "Triangulating a point cloud of 10.\n")
+            (bench (triangulate points-10))
+            (print "\n")
+            (print "Triangulating a point cloud of 1000.\n")
+            (bench (triangulate points-1000))
+            (print "\n"))))

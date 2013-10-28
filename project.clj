@@ -5,4 +5,5 @@
             :url "http://opensource.org/licenses/eclipse-1.0.php"}
   :dependencies [[org.clojure/clojure "1.5.1"]]
   :aliases {"benchmark" ["trampoline" "run" "-m" "triangulate.benchmark"]}
-  :jar-exclusions [#"^triangulate/benchmark\.clj$"])
+  :jar-exclusions [#"^triangulate/benchmark\.clj$"]
+   :profiles {:dev {:dependencies [[criterium "0.4.2"]]}})
