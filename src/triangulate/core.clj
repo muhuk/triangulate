@@ -1,14 +1,27 @@
 (ns triangulate.core)
 
 
-(defrecord Triangle [^long a ^long b ^long c A B C circumcenter ^double radius])
+(defrecord Point [^double x ^double y])
+
+
+(defrecord Triangle [^long a
+                     ^long b
+                     ^long c
+                     ^Point A
+                     ^Point B
+                     ^Point C
+                     ^Point circumcenter
+                     ^double radius])
 
 
 (declare distance sides)
-(defn circumcircle [a b c]
-  (let [[Ax Ay] a
-        [Bx By] b
-        [Cx Cy] c
+(defn circumcircle [^Point a ^Point b ^Point c]
+  (let [Ax (:x a)
+        Ay (:y a)
+        Bx (:x b)
+        By (:y b)
+        Cx (:x c)
+        Cy (:y c)
         dA (+ (* Ax Ax) (* Ay Ay))
         dB (+ (* Bx Bx) (* By By))
         dC (+ (* Cx Cx) (* Cy Cy))
@@ -25,7 +38,7 @@
                  (* dB (- Ax Cx))
                  (* dC (- Bx Ax)))
               (* -1 origin-denom))
-        circumcenter [Ox Oy]
+        circumcenter (Point. Ox Oy)
         radius (/ (* AB BC AC)
                   (Math/sqrt (* (+ AB BC AC)
                                 (- (+ AB BC) AC)
@@ -36,9 +49,9 @@
 
 (defn distance
   "Calculate distance between two points."
-  [[x1 y1] [x2 y2]]
-  (Math/sqrt (+ (Math/pow (- x2 x1) 2)
-                (Math/pow (- y2 y1) 2))))
+  [^Point a ^Point b]
+  (Math/sqrt (+ (Math/pow (- (:x b) (:x a)) 2)
+                (Math/pow (- (:y b) (:y a)) 2))))
 
 
 (defn find-edges
@@ -67,7 +80,7 @@
 
 (defn sides
   "Calculate the lengths of the sides of a triangle."
-  [a b c]
+  [^Point a ^Point b ^Point c]
   (vector (distance a b)
           (distance b c)
           (distance a c)))
@@ -75,11 +88,10 @@
 
 (defn point-in-circle?
   "Test whether the point is inside the circle."
-  [point center radius]
-    (< (distance point center) radius))
+  [^Point point ^Point center ^double radius]
+  (< (distance point center) radius))
 
 
-(declare point-in-circle?)
 (defn push-vertex
   "TODO"
   [triangles points i]
@@ -108,18 +120,18 @@
 (defn triangulate
   "TODO"
   [points]
-  (let [xs (map first points)
-        ys (map second points)
+  (let [xs (map #(:x %) points)
+        ys (map #(:y %) points)
         min-x (apply min xs)
         max-x (apply max xs)
         min-y (apply min ys)
         max-y (apply max ys)
         n (count points)
         margin (/ (max (- max-x min-x) (- max-y min-y)) 10)
-        temp-points [[(- min-x margin) (- min-y margin)]
-                     [(+ max-x margin) (- min-y margin)]
-                     [(- min-x margin) (+ max-y margin)]
-                     [(+ max-x margin) (+ max-y margin)]]
+        temp-points [(Point. (- min-x margin) (- min-y margin))
+                     (Point. (+ max-x margin) (- min-y margin))
+                     (Point. (- min-x margin) (+ max-y margin))
+                     (Point. (+ max-x margin) (+ max-y margin))]
         all-points (concat points temp-points)
         super-triangles [(make-triangle all-points
                                         n
