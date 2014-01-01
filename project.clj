@@ -6,4 +6,4 @@
   :dependencies [[org.clojure/clojure "1.5.1"]]
   :aliases {"benchmark" ["trampoline" "run" "-m" "triangulate.benchmark"]}
   :jar-exclusions [#"^triangulate/benchmark\.clj$"]
-   :profiles {:dev {:dependencies [[criterium "0.4.2"]]}})
+  :profiles {:dev {:dependencies [[criterium "0.4.2"]]}})
