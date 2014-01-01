@@ -6,10 +6,11 @@
 (declare distance sides)
 
 
-(defn circumcircle [^Point a ^Point b ^Point c]
+(defn circumcircle
   "The circumcircle is a triangle's circumscribed circle,
   i.e., the unique circle that passes through each of the
   triangle's three vertices."
+  [^Point a ^Point b ^Point c]
   (let [Ax (:x a)
         Ay (:y a)
         Bx (:x b)
