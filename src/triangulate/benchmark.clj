@@ -6,7 +6,8 @@
   Two data sets are used; one with 10 and another with 1000 points. It is
   advisable to run the benchmarks before and after substantial changes that
   might affect the performance and make sure the changes don't make it slower."
-  (:require [triangulate.core :refer [triangulate ->Point]]
+  (:require [triangulate.core :refer [triangulate]]
+            [triangulate.model :refer [->Point]]
             [criterium.core :refer [bench]])
   (:gen-class))
 

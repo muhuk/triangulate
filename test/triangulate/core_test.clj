@@ -1,6 +1,7 @@
 (ns triangulate.core-test
   (:require [clojure.test :refer :all]
-            [triangulate.core :refer :all]))
+            [triangulate.core :refer :all]
+            [triangulate.model :refer :all]))
 
 
 (defn- fuzzy= [tolerance x y]

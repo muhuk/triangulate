@@ -1,17 +1,6 @@
-(ns triangulate.core)
-
-
-(defrecord Point [^double x ^double y])
-
-
-(defrecord Triangle [^long a
-                     ^long b
-                     ^long c
-                     ^Point A
-                     ^Point B
-                     ^Point C
-                     ^Point circumcenter
-                     ^double radius])
+(ns triangulate.core
+     (:require [triangulate.model :refer [->Point ->Triangle]])
+     (:import [triangulate.model Point Triangle]))
 
 
 (declare distance sides)
@@ -43,7 +32,7 @@
                  (* dB (- Ax Cx))
                  (* dC (- Bx Ax)))
               (* -1 origin-denom))
-        circumcenter (Point. Ox Oy)
+        circumcenter (->Point Ox Oy)
         radius (/ (* AB BC AC)
                   (Math/sqrt (* (+ AB BC AC)
                                 (- (+ AB BC) AC)
@@ -79,7 +68,7 @@
         B (nth points b)
         C (nth points c)
         [circumcenter radius] (circumcircle A B C)]
-    (Triangle. a b c A B C circumcenter radius)))
+    (->Triangle a b c A B C circumcenter radius)))
 
 
 (defn sides
@@ -133,10 +122,10 @@
         max-y (apply max ys)
         n (count points)
         margin (/ (max (- max-x min-x) (- max-y min-y)) 10)
-        temp-points [(Point. (- min-x margin) (- min-y margin))
-                     (Point. (+ max-x margin) (- min-y margin))
-                     (Point. (- min-x margin) (+ max-y margin))
-                     (Point. (+ max-x margin) (+ max-y margin))]
+        temp-points [(->Point (- min-x margin) (- min-y margin))
+                     (->Point (+ max-x margin) (- min-y margin))
+                     (->Point (- min-x margin) (+ max-y margin))
+                     (->Point (+ max-x margin) (+ max-y margin))]
         all-points (concat points temp-points)
         super-triangles [(make-triangle all-points
                                         n
