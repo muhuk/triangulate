@@ -15,7 +15,12 @@
 
 
 (declare distance sides)
+
+
 (defn circumcircle [^Point a ^Point b ^Point c]
+  "The circumcircle is a triangle's circumscribed circle,
+  i.e., the unique circle that passes through each of the
+  triangle's three vertices."
   (let [Ax (:x a)
         Ay (:y a)
         Bx (:x b)
@@ -55,13 +60,13 @@
 
 
 (defn find-edges
-  "TODO"
+  "Find bordering edges of the polygon(s) given triangles form."
   [triangles]
   (let [edge-fn (fn [triangle a b] (vec (sort (vector (a triangle)
                                                       (b triangle)))))
         all-edges (vec (map #(vector (edge-fn % :a :b)
-                                (edge-fn % :b :c)
-                                (edge-fn % :a :c)) triangles))
+                                     (edge-fn % :b :c)
+                                     (edge-fn % :a :c)) triangles))
         flattened-edges (reduce concat [] all-edges)]
     (vec (map first
               (filter #(= (second %) 1)
@@ -69,7 +74,6 @@
 
 
 (defn make-triangle
-  "TODO"
   [points ^long a ^long b ^long c]
   (let [A (nth points a)
         B (nth points b)
@@ -93,7 +97,7 @@
 
 
 (defn push-vertex
-  "TODO"
+  "Build a new mesh with the given point added to existing vertices."
   [triangles points i]
   (let [point (nth points i)
         grouper (fn [triangle]
@@ -109,7 +113,8 @@
 
 
 (defn push-vertices
-  "TODO"
+  "Build a new mesh starting with an initial mesh and adding the first n
+  points."
  [triangles points n]
  (loop [tris triangles i 0]
     (if (< i n)
