@@ -18,10 +18,10 @@
   (testing "Two triangles sharing an edge form a polygon with 4 sides."
     (let [triangles [(make-triangle points 0 1 2)
                      (make-triangle points 1 2 3)]]
-      (is (= (find-edges triangles)
+      (is (= (set (find-edges triangles))
              (set [[0 1] [0 2] [1 3] [2 3]])))))
   (testing "Two triangles that don't share edges return their edges."
     (let [triangles [(make-triangle points 0 1 2)
                      (make-triangle points 3 4 5)]]
-      (is (= (find-edges triangles)
+      (is (= (set (find-edges triangles))
              (set [[0 1] [0 2] [1 2] [3 4] [3 5] [4 5]]))))))

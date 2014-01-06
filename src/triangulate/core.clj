@@ -9,7 +9,7 @@
 
 (defn- find-edges
   "Find bordering edges of the polygon(s) given triangles form.
-  Returns a set of two-tuples of point indices."
+  Returns a sequence of two-tuples of point indices."
   [triangles]
   (let [edge-fn (fn [triangle a b] (vec (sort (vector (a triangle)
                                                       (b triangle)))))
@@ -17,7 +17,7 @@
                                      (edge-fn % :b :c)
                                      (edge-fn % :a :c)) triangles))
         flattened-edges (reduce concat [] all-edges)]
-    (set (map first
+    (seq (map first
               (filter #(= (second %) 1)
                       (frequencies flattened-edges))))))
 
