@@ -8,7 +8,8 @@
 
 
 (defn- find-edges
-  "Find bordering edges of the polygon(s) given triangles form."
+  "Find bordering edges of the polygon(s) given triangles form.
+  Returns a sequence of two-tuples of point indices."
   [triangles]
   (let [edge-fn (fn [triangle a b] (vec (sort (vector (a triangle)
                                                       (b triangle)))))
