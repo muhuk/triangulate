@@ -15,13 +15,19 @@
 
 
 (deftest test-find-edges
-  (testing "Two triangles sharing an edge form a polygon with 4 sides."
+  (testing "An empty collection evaluates to an empty sequence."
+    (is (empty? (find-edges []))))
+  (testing "A single triangle evaluates to its three edges."
+    (let [triangles [(make-triangle points 0 1 2)]
+          result (find-edges triangles)]
+      (is (seq result))
+      (is (= (count result) 3))
+      (is (= (set result) (set [[0 1] [0 2] [1 2]])))))
+  (testing "Two triangles sharing an edge evaluates to a 4-sided polygon."
     (let [triangles [(make-triangle points 0 1 2)
-                     (make-triangle points 1 2 3)]]
-      (is (= (set (find-edges triangles))
-             (set [[0 1] [0 2] [1 3] [2 3]])))))
-  (testing "Two triangles that don't share edges return their edges."
-    (let [triangles [(make-triangle points 0 1 2)
-                     (make-triangle points 3 4 5)]]
-      (is (= (set (find-edges triangles))
-             (set [[0 1] [0 2] [1 2] [3 4] [3 5] [4 5]]))))))
+                     (make-triangle points 1 2 3)]
+          result (find-edges triangles)]
+      (is (seq result))
+      (is (= (count result) 4))
+      (is (= (set result)
+             (set [[0 1] [0 2] [1 3] [2 3]]))))))

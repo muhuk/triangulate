@@ -8,18 +8,17 @@
 
 
 (defn- find-edges
-  "Find bordering edges of the polygon(s) given triangles form.
+  "Find bordering edges of the polygon(s) form given triangles.
   Returns a sequence of two-tuples of point indices."
   [triangles]
-  (let [edge-fn (fn [triangle a b] (vec (sort (vector (a triangle)
-                                                      (b triangle)))))
-        all-edges (vec (map #(vector (edge-fn % :a :b)
-                                     (edge-fn % :b :c)
-                                     (edge-fn % :a :c)) triangles))
-        flattened-edges (reduce concat [] all-edges)]
-    (seq (map first
-              (filter #(= (second %) 1)
-                      (frequencies flattened-edges))))))
+  {:pre [(coll? triangles)
+         (every? #(instance? Triangle %) triangles)]}
+  (let [edges (mapcat #(vector (sort [(:a %) (:b %)])
+                               (sort [(:a %) (:c %)])
+                               (sort [(:b %) (:c %)])) triangles)]
+    (map first
+         (filter #(= (second %) 1)
+                 (frequencies edges)))))
 
 
 (defn- make-triangle
