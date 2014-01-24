@@ -1,10 +1,10 @@
 (ns triangulate.core
-     (:require [triangulate.model :refer [->Point ->Triangle]]
+     (:require [triangulate.model :refer [->Point ->Triangle ->TriangleData]]
                [triangulate.geom :refer [circumcircle
                                          distance
                                          sides
                                          point-in-circle?]])
-     (:import [triangulate.model Point Triangle]))
+     (:import [triangulate.model Point TriangleData]))
 
 
 (defn- find-edges
@@ -12,7 +12,7 @@
   Returns a sequence of two-tuples of point indices."
   [triangles]
   {:pre [(coll? triangles)
-         (every? #(instance? Triangle %) triangles)]}
+         (every? #(instance? TriangleData %) triangles)]}
   (let [edges (mapcat #(vector (sort [(:a %) (:b %)])
                                (sort [(:a %) (:c %)])
                                (sort [(:b %) (:c %)])) triangles)]
@@ -27,7 +27,7 @@
         B (nth points b)
         C (nth points c)
         [circumcenter radius] (circumcircle A B C)]
-    (->Triangle a b c A B C circumcenter radius)))
+    (->TriangleData a b c A B C circumcenter radius)))
 
 
 (defn- push-vertex
@@ -79,8 +79,9 @@
                          (make-triangle all-points
                                         (+ n 1)
                                         (+ n 2)
-                                        (+ n 3))]]
-    (filter #(and (< (:a %) n)
-                  (< (:b %) n)
-                  (< (:c %) n))
-            (push-vertices super-triangles all-points n))))
+                                        (+ n 3))]
+        cached-triangles (filter #(and (< (:a %) n)
+                                       (< (:b %) n)
+                                       (< (:c %) n))
+                                 (push-vertices super-triangles all-points n))]
+    (map #(->Triangle (:A %) (:B %) (:C %)) cached-triangles)))
