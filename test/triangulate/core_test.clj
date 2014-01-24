@@ -22,7 +22,9 @@
           result (find-edges triangles)]
       (is (seq result))
       (is (= (count result) 3))
-      (is (= (set result) (set [[0 1] [0 2] [1 2]])))))
+      (is (= (set result) (set [[(->Point 1 1) (->Point 2 3)]
+                                [(->Point 1 1) (->Point 3 2)]
+                                [(->Point 2 3) (->Point 3 2)]])))))
   (testing "Two triangles sharing an edge evaluates to a 4-sided polygon."
     (let [triangles [(make-triangle points 0 1 2)
                      (make-triangle points 1 2 3)]
@@ -30,4 +32,7 @@
       (is (seq result))
       (is (= (count result) 4))
       (is (= (set result)
-             (set [[0 1] [0 2] [1 3] [2 3]]))))))
+             (set [[(->Point 1 1) (->Point 2 3)]
+                   [(->Point 1 1) (->Point 3 2)]
+                   [(->Point 2 3) (->Point 4 4)]
+                   [(->Point 3 2) (->Point 4 4)]]))))))

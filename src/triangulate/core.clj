@@ -13,9 +13,9 @@
   [triangles]
   {:pre [(coll? triangles)
          (every? #(instance? TriangleData %) triangles)]}
-  (let [edges (mapcat #(vector (sort [(:a %) (:b %)])
-                               (sort [(:a %) (:c %)])
-                               (sort [(:b %) (:c %)])) triangles)]
+  (let [edges (mapcat #(vector (sort [(:A %) (:B %)])
+                               (sort [(:A %) (:C %)])
+                               (sort [(:B %) (:C %)])) triangles)]
     (map first
          (filter #(= (second %) 1)
                  (frequencies edges)))))
@@ -27,7 +27,7 @@
         B (nth points b)
         C (nth points c)
         [circumcenter radius] (circumcircle A B C)]
-    (->TriangleData a b c A B C circumcenter radius)))
+    (->TriangleData A B C circumcenter radius)))
 
 
 (defn- push-vertex
