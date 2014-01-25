@@ -1,10 +1,7 @@
 (ns triangulate.core
-     (:require [triangulate.model :refer [->Point ->Triangle ->TriangleData]]
-               [triangulate.geom :refer [circumcircle
-                                         distance
-                                         sides
-                                         point-in-circle?]])
-     (:import [triangulate.model Point TriangleData]))
+     (:require [triangulate.model :refer [->Point ->Triangle]]
+               [triangulate.geom :refer [circumcircle point-in-circle?]])
+     (:import [triangulate.model Point Triangle]))
 
 
 (defn- find-edges
@@ -12,37 +9,36 @@
   Returns a sequence of two-tuples of point indices."
   [triangles]
   {:pre [(coll? triangles)
-         (every? #(instance? TriangleData %) triangles)]}
-  (let [edges (mapcat #(vector (sort [(:A %) (:B %)])
-                               (sort [(:A %) (:C %)])
-                               (sort [(:B %) (:C %)])) triangles)]
+         (every? #(instance? Triangle %) triangles)]}
+  (let [edges (mapcat #(vector (sort [(:a %) (:b %)])
+                               (sort [(:a %) (:c %)])
+                               (sort [(:b %) (:c %)])) triangles)]
     (map first
          (filter #(= (second %) 1)
                  (frequencies edges)))))
 
 
 (defn- make-triangle
-  [points ^long a ^long b ^long c]
-  (let [A (nth points a)
-        B (nth points b)
-        C (nth points c)
-        [circumcenter radius] (circumcircle A B C)]
-    (->TriangleData A B C circumcenter radius)))
+  [^Point a ^Point b ^Point c]
+  (apply ->Triangle (sort [a b c])))
 
 
-(defn- push-vertex
+(defn points?
+  "Returns true if points is a collection that consists of points."
+  [points]
+  (and (coll? points)
+       (every? #(instance? Point %) points)))
+
+
+(defn push-vertex
   "Build a new mesh with the given point added to existing vertices."
-  [triangles points i]
-  (let [point (nth points i)
-        grouper (fn [triangle]
-                  (if (point-in-circle? point
-                                        (:circumcenter triangle)
-                                        (:radius triangle))
+  [point triangles]
+  (let [group-fn #(if (point-in-circle? point (circumcircle %))
                       :inside
-                      :outside))
-        {:keys [inside outside]} (group-by grouper triangles)
-        edges (find-edges inside)
-        new-triangles (map #(make-triangle points (first %) (second %) i) edges)]
+                      :outside)
+        {:keys [inside outside]} (group-by group-fn triangles)
+        new-triangles (map #(make-triangle (first %) (second %) point)
+                           (find-edges inside))]
     (concat outside new-triangles)))
 
 
@@ -59,6 +55,8 @@
 (defn triangulate
   "TODO"
   [points]
+  {:pre [(points? points)
+         (> (count points) 2)]}
   (let [xs (map #(:x %) points)
         ys (map #(:y %) points)
         min-x (apply min xs)
@@ -72,16 +70,14 @@
                      (->Point (- min-x margin) (+ max-y margin))
                      (->Point (+ max-x margin) (+ max-y margin))]
         all-points (concat points temp-points)
-        super-triangles [(make-triangle all-points
-                                        n
-                                        (+ n 1)
-                                        (+ n 2))
-                         (make-triangle all-points
-                                        (+ n 1)
-                                        (+ n 2)
-                                        (+ n 3))]
-        cached-triangles (filter #(and (< (:a %) n)
-                                       (< (:b %) n)
-                                       (< (:c %) n))
-                                 (push-vertices super-triangles all-points n))]
-    (map #(->Triangle (:A %) (:B %) (:C %)) cached-triangles)))
+        super-triangles [(make-triangle (temp-points 0)
+                                        (temp-points 1)
+                                        (temp-points 2))
+                         (make-triangle (temp-points 1)
+                                        (temp-points 2)
+                                        (temp-points 3))]
+        temporary-triangle? (fn [triangle] (or (contains? temp-points (:a triangle))
+                                               (contains? temp-points (:b triangle))
+                                               (contains? temp-points (:c triangle))))]
+    (remove temporary-triangle?
+            (push-vertices super-triangles all-points n))))

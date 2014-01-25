@@ -1,26 +1,26 @@
 (ns triangulate.geom
-    (:require [triangulate.model :refer [->Point]])
-    (:import [triangulate.model Point]))
+    (:require [triangulate.model :refer [->Circle ->Point]])
+    (:import [triangulate.model Circle Point Triangle]))
 
 
-(declare distance sides)
+(declare sides)
 
 
 (defn circumcircle
   "The circumcircle is a triangle's circumscribed circle,
   i.e., the unique circle that passes through each of the
   triangle's three vertices."
-  [^Point a ^Point b ^Point c]
-  (let [Ax (:x a)
-        Ay (:y a)
-        Bx (:x b)
-        By (:y b)
-        Cx (:x c)
-        Cy (:y c)
+  [^Triangle triangle]
+  (let [Ax (get-in triangle [:a :x])
+        Ay (get-in triangle [:a :y])
+        Bx (get-in triangle [:b :x])
+        By (get-in triangle [:b :y])
+        Cx (get-in triangle [:c :x])
+        Cy (get-in triangle [:c :y])
         dA (+ (* Ax Ax) (* Ay Ay))
         dB (+ (* Bx Bx) (* By By))
         dC (+ (* Cx Cx) (* Cy Cy))
-        [AB BC AC] (sides a b c)
+        [AB BC AC] (sides triangle)
         origin-denom (* 2
                         (+ (* Ax (- Cy By))
                            (* Bx (- Ay Cy))
@@ -39,7 +39,7 @@
                                 (- (+ AB BC) AC)
                                 (- (+ BC AC) AB)
                                 (- (+ AB AC) BC))))]
-    [circumcenter radius]))
+    (->Circle circumcenter radius)))
 
 
 (defn distance
@@ -51,13 +51,14 @@
 
 (defn sides
   "Calculate the lengths of the sides of a triangle."
-  [^Point a ^Point b ^Point c]
-  (vector (distance a b)
-          (distance b c)
-          (distance a c)))
+  [^Triangle triangle]
+  (let [{:keys [a b c]} triangle]
+    (vector (distance a b)
+            (distance b c)
+            (distance a c))))
 
 
 (defn point-in-circle?
   "Test whether the point is inside the circle."
-  [^Point point ^Point center ^double radius]
-  (< (distance point center) radius))
+  [^Point point ^Circle circle]
+  (< (distance point (:center circle)) (:radius circle)))

@@ -11,11 +11,7 @@
           compare-x))))
 
 
+(defrecord Circle [^Point center ^double radius])
+
+
 (defrecord Triangle [^Point a ^Point b ^Point c])
-
-
-(defrecord TriangleData [^Point A
-                         ^Point B
-                         ^Point C
-                         ^Point circumcenter
-                         ^double radius])
