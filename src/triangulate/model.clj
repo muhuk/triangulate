@@ -28,3 +28,17 @@
 (defn make-triangle
   [^Point a ^Point b ^Point c]
   (apply ->Triangle (sort [a b c])))
+
+
+(defn points?
+  "Returns true if points is a collection that consists of points."
+  [points]
+  (and (coll? points)
+       (every? #(instance? Point %) points)))
+
+
+(defn triangles?
+  "Returns true if triangles is a collection that consists of triangles."
+  [triangles]
+  (and (coll? triangles)
+       (every? #(instance? Triangle %) triangles)))
