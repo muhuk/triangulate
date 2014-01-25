@@ -18,14 +18,14 @@
                  (frequencies edges)))))
 
 
-(defn points?
+(defn- points?
   "Returns true if points is a collection that consists of points."
   [points]
   (and (coll? points)
        (every? #(instance? Point %) points)))
 
 
-(defn push-vertex
+(defn- push-vertex
   "Build a new mesh with the given point added to existing vertices."
   [point triangles]
   (let [group-fn #(if (point-in-circle? point (circumcircle %))
@@ -38,13 +38,11 @@
 
 
 (defn- push-vertices
-  "Build a new mesh starting with an initial mesh and adding the first n
-  points."
- [triangles points n]
- (loop [tris triangles i 0]
-    (if (< i n)
-        (recur (push-vertex tris points i) (inc i))
-        tris)))
+  "Build a new mesh starting with an initial mesh and adding points."
+ [points triangles]
+ (if (empty? points)
+   triangles
+   (recur (rest points) (push-vertex (first points) triangles))))
 
 
 (defn triangulate

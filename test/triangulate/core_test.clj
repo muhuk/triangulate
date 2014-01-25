@@ -1,11 +1,14 @@
 (ns triangulate.core-test
   (:require [clojure.test :refer :all]
-            [triangulate.core :refer [points? push-vertex]]
+            [triangulate.core]
             [triangulate.geom :refer [point-in-circle?]]
             [triangulate.model :refer [->Edge ->Point ->Triangle]]))
 
 
 (def find-edges (ns-resolve 'triangulate.core 'find-edges))
+(def points? (ns-resolve 'triangulate.core 'points?))
+(def push-vertices (ns-resolve 'triangulate.core 'push-vertices))
+(def push-vertex (ns-resolve 'triangulate.core 'push-vertex))
 
 
 (deftest test-find-edges
@@ -54,10 +57,25 @@
 
 
 (deftest test-push-vertex
-  (testing "A point within a triangle evaluates to three triangles that share this point."
-    (let [triangles [(->Triangle (->Point 1 1) (->Point 4 5) (->Point 5 4))]
+  (testing "A point within circumcircle of a quad would replace them."
+    (let [triangles [(->Triangle (->Point 1 1) (->Point 1 9) (->Point 7 1))
+                     (->Triangle (->Point 1 9) (->Point 7 1) (->Point 7 9))
+                     (->Triangle (->Point 7 1) (->Point 7 9) (->Point 11 5))]
           point (->Point 2 2)]
-      (is (= (set [(->Triangle (->Point 1 1) (->Point 2 2) (->Point 4 5))
-                   (->Triangle (->Point 2 2) (->Point 4 5) (->Point 5 4))
-                   (->Triangle (->Point 1 1) (->Point 2 2) (->Point 5 4))])
+      (is (= (set [(->Triangle (->Point 1 1) (->Point 2 2) (->Point 7 1))
+                   (->Triangle (->Point 1 9) (->Point 2 2) (->Point 7 9))
+                   (->Triangle (->Point 1 1) (->Point 1 9) (->Point 2 2))
+                   (->Triangle (->Point 2 2) (->Point 7 1) (->Point 7 9))
+                   (->Triangle (->Point 7 1) (->Point 7 9) (->Point 11 5))])
              (set (push-vertex point triangles)))))))
+
+
+(deftest test-push-vertices
+  (testing ""
+    (let [triangles [(->Triangle (->Point 0 0) (->Point 0 100) (->Point 100 0))
+                     (->Triangle (->Point 0 100) (->Point 100 0) (->Point 100 100))]
+          points [(->Point 2 2) (->Point 50 50) (->Point 98 98)]]
+      (is (= (set (push-vertex (->Point 2 2)
+                               (push-vertex (->Point 50 50)
+                                            (push-vertex (->Point 98 98) triangles))))
+             (set (push-vertices points triangles)))))))
