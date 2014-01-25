@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [triangulate.core :refer [points? push-vertex]]
             [triangulate.geom :refer [point-in-circle?]]
-            [triangulate.model :refer [->Point ->Triangle]]))
+            [triangulate.model :refer [->Edge ->Point ->Triangle]]))
 
 
 (def find-edges (ns-resolve 'triangulate.core 'find-edges))
@@ -16,9 +16,9 @@
           result (find-edges triangles)]
       (is (seq result))
       (is (= (count result) 3))
-      (is (= (set result) (set [[(->Point 1 1) (->Point 2 3)]
-                                [(->Point 1 1) (->Point 3 2)]
-                                [(->Point 2 3) (->Point 3 2)]])))))
+      (is (= (set result) (set [(->Edge (->Point 1 1) (->Point 2 3))
+                                (->Edge (->Point 1 1) (->Point 3 2))
+                                (->Edge (->Point 2 3) (->Point 3 2))])))))
   (testing "Two triangles sharing an edge evaluates to a 4-sided polygon."
     (let [triangles [(->Triangle (->Point 1 1) (->Point 2 3) (->Point 3 2))
                      (->Triangle (->Point 2 3) (->Point 3 2) (->Point 4 4))]
@@ -26,10 +26,10 @@
       (is (seq result))
       (is (= (count result) 4))
       (is (= (set result)
-             (set [[(->Point 1 1) (->Point 2 3)]
-                   [(->Point 1 1) (->Point 3 2)]
-                   [(->Point 2 3) (->Point 4 4)]
-                   [(->Point 3 2) (->Point 4 4)]]))))))
+             (set [(->Edge (->Point 1 1) (->Point 2 3))
+                   (->Edge (->Point 1 1) (->Point 3 2))
+                   (->Edge (->Point 2 3) (->Point 4 4))
+                   (->Edge (->Point 3 2) (->Point 4 4))]))))))
 
 
 (deftest test-points?

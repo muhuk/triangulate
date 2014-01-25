@@ -1,5 +1,5 @@
 (ns triangulate.core
-     (:require [triangulate.model :refer [->Point ->Triangle]]
+     (:require [triangulate.model :refer [->Point make-edge make-triangle]]
                [triangulate.geom :refer [circumcircle point-in-circle?]])
      (:import [triangulate.model Point Triangle]))
 
@@ -10,17 +10,12 @@
   [triangles]
   {:pre [(coll? triangles)
          (every? #(instance? Triangle %) triangles)]}
-  (let [edges (mapcat #(vector (sort [(:a %) (:b %)])
-                               (sort [(:a %) (:c %)])
-                               (sort [(:b %) (:c %)])) triangles)]
+  (let [edges (mapcat #(vector (make-edge (:a %) (:b %))
+                               (make-edge (:a %) (:c %))
+                               (make-edge (:b %) (:c %))) triangles)]
     (map first
          (filter #(= (second %) 1)
                  (frequencies edges)))))
-
-
-(defn- make-triangle
-  [^Point a ^Point b ^Point c]
-  (apply ->Triangle (sort [a b c])))
 
 
 (defn points?
@@ -37,7 +32,7 @@
                       :inside
                       :outside)
         {:keys [inside outside]} (group-by group-fn triangles)
-        new-triangles (map #(make-triangle (first %) (second %) point)
+        new-triangles (map #(make-triangle (:a %) (:b %) point)
                            (find-edges inside))]
     (concat outside new-triangles)))
 
