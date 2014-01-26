@@ -1,9 +1,10 @@
 (ns triangulate.mesh-test
   (:require [clojure.test :refer :all]
             [triangulate.mesh :refer [find-edges
-                                      push-vertices
                                       push-vertex
-                                      super-mesh-corners]]
+                                      push-vertices
+                                      super-mesh-corners
+                                      with-super-mesh]]
             [triangulate.model :refer [->Edge ->Point ->Triangle]]))
 
 
@@ -66,3 +67,14 @@
                   (->Point 3 3)]]
       (is (= (set [(->Point 0 0) (->Point 0 4) (->Point 4 0) (->Point 4 4)])
              (set (super-mesh-corners points margin)))))))
+
+
+(deftest test-with-super-mesh
+  (testing "Super mesh is built and then removed."
+    (let [mock #(conj %2 :mock-called)
+          points [(->Point 1 1)
+                  (->Point 1 3)
+                  (->Point 3 1)
+                  (->Point 3 3)]]
+      (is (= [:mock-called]
+             (with-super-mesh mock points))))))

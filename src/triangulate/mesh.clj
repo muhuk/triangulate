@@ -58,3 +58,19 @@
      (->Point (+ max-x margin) (- min-y margin))
      (->Point (- min-x margin) (+ max-y margin))
      (->Point (+ max-x margin) (+ max-y margin))]))
+
+
+(defn with-super-mesh
+  ""
+  [f points]
+  {:pre [(ifn? f)
+         (points? points)]}
+  (let [margin 1
+        [k l m n :as super-vertices] (super-mesh-corners points margin)
+        super-mesh [(make-triangle k l m)
+                    (make-triangle l m n)]
+        super-vertices (set super-vertices)
+        in-super-mesh? #(or (contains? super-vertices (:a %))
+                            (contains? super-vertices (:b %))
+                            (contains? super-vertices (:c %)))]
+    (remove in-super-mesh? (f points super-mesh))))
