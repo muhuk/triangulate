@@ -1,4 +1,4 @@
-(defproject triangulate "0.1.0-SNAPSHOT"
+(defproject triangulate "0.1.1-SNAPSHOT"
   :description "A Clojure implementation of \"Efficient Triangulation Algorithm Suitable for Terrain Modelling\" (Bourke, 1989)."
   :url "https://github.com/muhuk/triangulate"
   :license {:name "Eclipse Public License"
