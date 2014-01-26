@@ -1,5 +1,6 @@
 (ns triangulate.mesh
      (:require [triangulate.model :refer [->Point
+                                          edges?
                                           make-edge
                                           make-triangle
                                           points?
@@ -10,9 +11,10 @@
 
 (defn find-edges
   "Find bordering edges of the polygon(s) form given triangles.
-  Returns a sequence of two-tuples of point indices."
+  Returns a sequence of Edge's."
   [triangles]
-  {:pre [(triangles? triangles)]}
+  {:pre [(triangles? triangles)]
+   :post [(edges? %)]}
   (let [edges (mapcat #(vector (make-edge (:a %) (:b %))
                                (make-edge (:a %) (:c %))
                                (make-edge (:b %) (:c %))) triangles)]
@@ -22,9 +24,10 @@
 
 
 (defn push-vertex
-  "Build a new mesh with the given point added to existing vertices."
+  "Build a new mesh with the given point added to existing triangles."
   [^Point point triangles]
-  {:pre [(triangles? triangles)]}
+  {:pre [(triangles? triangles)]
+   :post [(triangles? %)]}
   (let [group-fn #(if (point-in-circle? point (circumcircle %))
                       :inside
                       :outside)
@@ -36,18 +39,24 @@
 
 (defn push-vertices
   "Build a new mesh starting with an initial mesh and adding points."
- [points triangles]
- {:pre [(points? points)
-        (triangles? triangles)]}
- (if (empty? points)
-   triangles
-   (recur (rest points) (push-vertex (first points) triangles))))
+  [points triangles]
+  {:pre [(points? points)
+         (triangles? triangles)]
+   :post [(triangles? %)]}
+  (letfn [(f [points triangles]
+             (if (empty? points)
+                 triangles
+                 (recur (rest points)
+                        (push-vertex (first points) triangles))))]
+  (f points triangles)))
 
 
 (defn super-mesh-corners
-  ""
+  "Calculate corners of a bounding rectangle for the point cloud."
   [points margin]
-  {:pre [(points? points)]}
+  {:pre [(points? points)
+         (number? margin)
+         (> margin 0)]}
   (let [xs (map #(:x %) points)
         ys (map #(:y %) points)
         min-x (apply min xs)
@@ -61,10 +70,14 @@
 
 
 (defn with-super-mesh
-  ""
+  "Call f with the point cloud and it's super mesh then clean the triangles
+  using the super mesh vertices before returning the result.
+
+  f is typically push-vertices."
   [f points]
   {:pre [(ifn? f)
-         (points? points)]}
+         (points? points)]
+   :post [(triangles? %)]}
   (let [margin 1
         [k l m n :as super-vertices] (super-mesh-corners points margin)
         super-mesh [(make-triangle k l m)

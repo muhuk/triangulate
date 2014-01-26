@@ -71,10 +71,11 @@
 
 (deftest test-with-super-mesh
   (testing "Super mesh is built and then removed."
-    (let [mock #(conj %2 :mock-called)
+    (let [mock-triangle (->Triangle (->Point 1 1) (->Point 1 3) (->Point 3 1))
+          mock #(conj %2 mock-triangle)
           points [(->Point 1 1)
                   (->Point 1 3)
                   (->Point 3 1)
                   (->Point 3 3)]]
-      (is (= [:mock-called]
+      (is (= [mock-triangle]
              (with-super-mesh mock points))))))

@@ -20,12 +20,21 @@
 (defrecord Triangle [^Point a ^Point b ^Point c])
 
 
+(defn edges?
+  "Returns true if points is a collection that consists of edges."
+  [edges]
+  (and (coll? edges)
+       (every? #(instance? Edge %) edges)))
+
+
 (defn make-edge
+  "Same as ->Edge, but sorts points."
   [^Point a ^Point b]
   (apply ->Edge (sort [a b])))
 
 
 (defn make-triangle
+  "Same as ->Triangle, but sorts points."
   [^Point a ^Point b ^Point c]
   (apply ->Triangle (sort [a b c])))
 
